@@ -1,0 +1,10 @@
+Metadata-Version: 1.0
+Name: kwrawler
+Version: 0.1
+Summary: A python module to crawl a single domain and output a sitemap
+Home-page: https://github.com/keithwoody/kwrawler-python
+Author: Keith Woody
+Author-email: keith.woody@gmail.com
+License: UNKNOWN
+Description: UNKNOWN
+Platform: UNKNOWN

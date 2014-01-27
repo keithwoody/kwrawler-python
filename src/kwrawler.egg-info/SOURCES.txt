@@ -1,0 +1,9 @@
+README.txt
+setup.py
+src/kwrawler/__init__.py
+src/kwrawler/sitemap.py
+src/kwrawler.egg-info/PKG-INFO
+src/kwrawler.egg-info/SOURCES.txt
+src/kwrawler.egg-info/dependency_links.txt
+src/kwrawler.egg-info/top_level.txt
+src/kwrawler.egg-info/zip-safe
