@@ -5,7 +5,8 @@ class KwrawlerTestCase(unittest.TestCase):
 
     def test_crawl_with_bad_uri(self):
         assert "Invalid URI: 'bad.uri'" == kwrawler.crawl('bad.uri')
-    def test_crawl(self):
+
+    def test_crawl_example_com(self):
         assert None == kwrawler.crawl('http://example.com')
 
 
