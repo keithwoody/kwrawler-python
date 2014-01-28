@@ -1,2 +1,4 @@
 *.egg
 *.pyc
+*-sitemap.*
+sitemap.png
