@@ -5,7 +5,7 @@ import urllib
 import time
 import re
 from bs4 import BeautifulSoup
-from pydot import Dot, Node, Edge
+from pydot import Graph, Node, Edge
 
 
 
@@ -16,6 +16,7 @@ class Sitemap(object):
     base_url = None
     current_uri = None
     current_url = None
+    site_graph = None
 
     def __init__(self):
         self.site_dict = { 'pages': [],
@@ -37,8 +38,19 @@ class Sitemap(object):
         else:
             return self.URI_FAILURE % uri
 
-    def render_sitemap(self, options={}):
-        self.site_graph = Dot(graph_type='digraph')
+    def build_site_graph(self):
+        self.site_graph = Graph(graph_type='digraph')
+        self.site_graph.set_label( 'Sitemap for "%s"' % self.base_uri )
+        self.site_graph.set_simplify( True )
+        # add nodes
+        for page in self.site_dict['pages']:
+            self.site_graph.add_node( page.to_node() )
+        # add edges
+        for page in self.site_dict['pages']:
+            from_node = page.uri
+            for link in page.attributes['links']:
+              to_node = link
+              self.site_graph.add_edge( Edge(from_node, to_node) )
 
     def traverse_site(self, uri_str):
         if self.validate_uri( uri_str ):
@@ -143,5 +155,12 @@ class Link(object):
 
 class Page(object):
     def __init__(self, uri, attributes):
-      self.uri = uri
-      self.attributes = attributes
+        self.uri = uri
+        self.attributes = attributes
+    def to_node(self):
+        node = Node(self.uri)
+        node.set_label( self.label_for_properties() )
+        return node
+    def label_for_properties(self):
+        return "{%s}" % self.uri
+

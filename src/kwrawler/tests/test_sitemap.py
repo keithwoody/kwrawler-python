@@ -3,6 +3,7 @@ import unittest
 import os.path
 from mock import patch, Mock
 from io import StringIO
+import pydot
 
 class SitemapTestCase(unittest.TestCase):
     def setUp(self):
@@ -99,10 +100,38 @@ class SitemapTestCase(unittest.TestCase):
                 assert 'http://example.com/internal' in page_lst
                 self.assertEqual(2, len( page_lst ))
 
-    def test_build_site_graph(self):
-        # assert False
-        pass
+    def test_build_site_graph_should_init_site_graph(self):
+        self.sitemap_obj.build_site_graph()
+        assert self.sitemap_obj.site_graph is not None
+        assert isinstance( self.sitemap_obj.site_graph, pydot.Graph )
 
+    def test_build_site_graph_should_add_a_label_for_the_image(self):
+        self.sitemap_obj.build_site_graph()
+        assert self.sitemap_obj.site_graph.get_label() == 'Sitemap for "None"'
+
+    def test_build_site_graph_should_coalesce_duplicated_edges(self):
+        self.sitemap_obj.build_site_graph()
+        self.assertEqual( True, self.sitemap_obj.site_graph.get_simplify() )
+
+    def test_build_site_graph_should_add_a_node_for_each_page(self):
+        with patch.object(self.sitemap_obj, 'validate_uri') as mocked_validate_uri:
+            mocked_validate_uri.return_value = True
+            with patch('urllib.urlopen') as mock_get:
+                mock_get.return_value = self.mock_response
+                self.sitemap_obj.traverse_site( 'http://example.com/' )
+                self.sitemap_obj.build_site_graph()
+                node_cnt = len( self.sitemap_obj.site_graph.get_nodes() )
+                assert 2 == node_cnt
+
+    def test_build_site_graph_should_add_an_edge_for_each_link_between_pages(self):
+        with patch.object(self.sitemap_obj, 'validate_uri') as mocked_validate_uri:
+            mocked_validate_uri.return_value = True
+            with patch('urllib.urlopen') as mock_get:
+                mock_get.return_value = self.mock_response
+                self.sitemap_obj.traverse_site( 'http://example.com/' )
+                self.sitemap_obj.build_site_graph()
+                edge_cnt = len( self.sitemap_obj.site_graph.get_edges() )
+                assert 1 == edge_cnt
 
 def suite():
     loader = unittest.TestLoader()
