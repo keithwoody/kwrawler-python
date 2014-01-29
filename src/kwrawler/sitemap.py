@@ -5,7 +5,7 @@ import urllib
 import time
 import re
 from bs4 import BeautifulSoup
-from pydot import Graph, Node, Edge
+from pydot import Dot, Node, Edge
 
 
 
@@ -37,7 +37,7 @@ class Sitemap(object):
             return self.URI_FAILURE % uri
 
     def build_site_graph(self):
-        self.site_graph = Graph(graph_type='digraph')
+        self.site_graph = Dot(graph_type='digraph')
         self.site_graph.set_label( 'Sitemap for "%s"' % self.base_uri )
         self.site_graph.set_simplify( True )
         # add nodes
@@ -59,8 +59,9 @@ class Sitemap(object):
         filename = 'sitemap.%s' % file_fmt
         if 'filename' in options.keys() and options['filename'] is not None:
             filename = options['filename']
-        with open(filename, 'w') as sitemap_img:
-            sitemap_img.write("TODO")
+        self.site_graph.write(filename, 'dot', file_fmt)
+        # with open(filename, 'w') as sitemap_img:
+        #     sitemap_img.write("TODO")
 
 
     def traverse_site(self, uri_str):

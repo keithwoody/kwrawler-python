@@ -138,7 +138,7 @@ class SitemapTestCase(unittest.TestCase):
     def test_build_site_graph_should_init_site_graph(self):
         self.sitemap_obj.build_site_graph()
         assert self.sitemap_obj.site_graph is not None
-        assert isinstance( self.sitemap_obj.site_graph, pydot.Graph )
+        assert isinstance( self.sitemap_obj.site_graph, pydot.Dot )
 
     def test_build_site_graph_should_add_a_label_for_the_image(self):
         self.sitemap_obj.build_site_graph()
