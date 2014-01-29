@@ -1,6 +1,6 @@
 # A python translation of a demo ruby gem
 from urlparse import urlparse
-# import 'sitemap'
+from sitemap import Sitemap
 
 
 def crawl( uri ):
@@ -13,8 +13,4 @@ def crawl( uri ):
         return "Invalid URI: '%s'" % (uri)
     else:
         print "create and render sitemap"
-        filename = 'sitemap.png'
-        with open(filename, 'w') as sitemap_img:
-            sitemap_img.write("TODO")
-    # sitemap = Sitemap()
-    # sitemap.from_uri( uri )
+        sitemap = Sitemap().from_uri( uri )
