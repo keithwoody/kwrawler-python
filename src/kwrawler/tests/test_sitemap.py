@@ -29,7 +29,7 @@ class SitemapTestCase(unittest.TestCase):
         with self.assertRaises( TypeError ):
             self.sitemap_obj.from_uri()
         self.sitemap_obj.from_uri( 'http://example.com' )
-        self.assertEqual( 'http://example.com', self.sitemap_obj.uri )
+        self.assertEqual( 'http://example.com', self.sitemap_obj.base_uri )
 
     def test_from_uri_should_exit_gracefully_for_a_bad_uri(self):
         error_msg = "failed to read URI 'http://not.valid'"
@@ -76,6 +76,28 @@ class SitemapTestCase(unittest.TestCase):
             self.assertEqual( True, 'local.png' in img_lst )
             self.assertEqual( 1, len(img_lst) )
 
+    def test_traverse_site_should_add_internal_links_to_site_dict(self):
+        with patch('urllib.urlopen') as mock_get:
+            mock_get.return_value = self.mock_response
+            self.sitemap_obj.traverse_site( 'http://example.com/' )
+            link_lst = self.sitemap_obj.site_dict['links'].keys()
+            assert 'http://example.com/internal' in link_lst
+            assert 'http://example.com/internal#with_anchor' not in link_lst
+            assert 'http://external.com/about' not in link_lst
+            print link_lst
+            self.assertEqual( 2, len(link_lst) )
+
+    def test_traverse_site_should_add_a_page_for_unique_uris(self):
+        # fake validating URIs so it doesn't fail on example.com/internal
+        with patch.object(self.sitemap_obj, 'validate_uri') as mocked_validate_uri:
+            mocked_validate_uri.return_value = True
+            with patch('urllib.urlopen') as mock_get:
+                mock_get.return_value = self.mock_response
+                self.sitemap_obj.traverse_site( 'http://example.com/' )
+                page_lst = [ p.uri for p in self.sitemap_obj.site_dict['pages'] ]
+                assert 'http://example.com/' in page_lst
+                assert 'http://example.com/internal' in page_lst
+                self.assertEqual(2, len( page_lst ))
 
     def test_build_site_graph(self):
         # assert False
