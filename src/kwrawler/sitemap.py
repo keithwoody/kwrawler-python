@@ -32,9 +32,7 @@ class Sitemap(object):
         self.base_uri = uri
         self.base_url = urlparse(uri)
         if self.traverse_site( uri ):
-            # img_format = render_opts['format'] or 'png'
-            # render_sitemap( img_format, render_options )
-            pass
+            self.render_sitemap( render_opts )
         else:
             return self.URI_FAILURE % uri
 
@@ -51,6 +49,19 @@ class Sitemap(object):
             for link in page.attributes['links']:
               to_node = link
               self.site_graph.add_edge( Edge(from_node, to_node) )
+
+    def render_sitemap(self, options={}):
+        if self.site_graph is None:
+            self.build_site_graph()
+        file_fmt = 'png'
+        if 'format' in options.keys() and options['format'] is not None:
+            file_fmt = options['format']
+        filename = 'sitemap.%s' % file_fmt
+        if 'filename' in options.keys() and options['filename'] is not None:
+            filename = options['filename']
+        with open(filename, 'w') as sitemap_img:
+            sitemap_img.write("TODO")
+
 
     def traverse_site(self, uri_str):
         if self.validate_uri( uri_str ):

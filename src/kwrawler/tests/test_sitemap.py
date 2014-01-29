@@ -40,9 +40,44 @@ class SitemapTestCase(unittest.TestCase):
         self.assertEqual(True, self.sitemap_obj.validate_uri("http://example.com/"))
         self.assertEqual(False, self.sitemap_obj.validate_uri("http://not.valid/"))
 
-    def test_render_sitemap_1(self):
-        # assert False
-        pass
+    def test_render_sitemap_should_build_the_site_graph_just_once(self):
+        assert self.sitemap_obj.site_graph is None
+        self.sitemap_obj.render_sitemap()
+        g1 = self.sitemap_obj.site_graph
+        assert g1 is not None
+        self.sitemap_obj.render_sitemap()
+        g2 = self.sitemap_obj.site_graph
+        self.assertEqual(g1, g2)
+
+    def test_render_sitemap_should_default_to_png_output(self):
+        if os.path.isfile('sitemap.png'):
+            os.remove('sitemap.png')
+        assert False == os.path.isfile('sitemap.png')
+        with patch('urllib.urlopen') as mock_get:
+            mock_get.return_value = self.mock_response
+            self.sitemap_obj.traverse_site( 'http://example.com/' )
+            self.sitemap_obj.render_sitemap()
+        assert True == os.path.isfile('sitemap.png')
+
+    def test_render_sitemap_should_use_format_from_options_hash(self):
+        if os.path.isfile('sitemap.jpg'):
+            os.remove('sitemap.jpg')
+        self.assertEqual( False, os.path.isfile('sitemap.jpg') )
+        with patch('urllib.urlopen') as mock_get:
+            mock_get.return_value = self.mock_response
+            self.sitemap_obj.traverse_site( 'http://example.com/' )
+            self.sitemap_obj.render_sitemap({'format': 'jpg'})
+        self.assertEqual( True, os.path.isfile('sitemap.jpg') )
+
+    def test_render_sitemap_should_use_filename_from_options_hash(self):
+        if os.path.isfile('sitemap.JPG'):
+            os.remove('sitemap.JPG')
+        self.assertEqual( False, os.path.isfile('sitemap.JPG') )
+        with patch('urllib.urlopen') as mock_get:
+            mock_get.return_value = self.mock_response
+            self.sitemap_obj.traverse_site( 'http://example.com/' )
+            self.sitemap_obj.render_sitemap({'format': 'jpg', 'filename': 'sitemap.JPG'})
+        self.assertEqual( True, os.path.isfile('sitemap.JPG') )
 
     def test_retrieve(self):
         # assert False
